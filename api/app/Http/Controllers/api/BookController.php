@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BookRequest;
 use App\Models\Book;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Exceptions\Renderer\Exception as RendererException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -36,7 +38,7 @@ class BookController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(BookRequest $request)
     {
         try {
             $book = Book::create([
@@ -57,7 +59,7 @@ class BookController extends Controller
                     "isbn" => $book->isbn
                 ]
             ], 201);
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
             return response(
                 [
                     "error" => [
@@ -107,7 +109,7 @@ class BookController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(BookRequest $request, string $id)
     {
         try {
             $book = Book::findOrFail($id);
