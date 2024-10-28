@@ -7,6 +7,7 @@ use App\Models\Book;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class BookController extends Controller
@@ -105,7 +106,40 @@ class BookController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            $book = Book::findOrFail($id);
+            $book->update([
+                "title" => $request->title,
+                "author" => $request->author,
+                "description" => $request->description,
+                "published_date" => $request->published_date,
+                "isbn" => $request->isbn
+            ]);
+
+            return response()->json([
+                "message" => "Livro atualizado com sucesso",
+                "book" => [
+                    "title" => $book->title,
+                    "author" => $book->author,
+                    "description" => $book->description,
+                    "published_date" => $book->published_date,
+                    "isbn" => $book->isbn
+                ]
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                "error" => [
+                    "message" => "Livro não encontrado"
+                ]
+            ], 404);
+        } catch (Throwable $e) {
+            return response()->json([
+                "error" => [
+                    "message" => "Ocorreu um erro ao atualizar o livro",
+                    "details" => $e->getMessage()
+                ]
+            ], 500);
+        }
     }
 
     /**
