@@ -50,7 +50,10 @@ class BookController extends Controller
             return response([
                 "message" => "Livro cadastrado com sucesso",
                 "book" => [
-                    "name" => $book->title,
+                    "title" => $book->title,
+                    "author" => $book->author,
+                    "description" => $book->description,
+                    "published_date" => $book->published_date,
                     "isbn" => $book->isbn
                 ]
             ], 201);
@@ -147,6 +150,26 @@ class BookController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $book = Book::findOrFail($id);
+            $book->destroy($id);
+
+            return response()->json([
+                "message" => "Livro deletado com sucesso",
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                "error" => [
+                    "message" => "Livro não encontrado"
+                ]
+            ], 404);
+        } catch (Throwable $e) {
+            return response()->json([
+                "error" => [
+                    "message" => "Ocorreu um erro ao tentar deletar o livro",
+                    "details" => $e->getMessage()
+                ]
+            ], 500);
+        }
     }
 }
