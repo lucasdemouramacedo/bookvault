@@ -20,7 +20,7 @@ class BookController extends Controller
     public function index()
     {
         try {
-            $books = Book::all(['title', 'author', 'description', 'published_date', 'isbn']);
+            $books = Book::paginate(10);
 
             return response()->json([
                 "books" => $books
@@ -169,6 +169,27 @@ class BookController extends Controller
             return response()->json([
                 "error" => [
                     "message" => "Ocorreu um erro ao tentar deletar o livro",
+                    "details" => $e->getMessage()
+                ]
+            ], 500);
+        }
+    }
+
+    /**
+     * Display a listing of the resource by book title.
+     */
+    public function search(Request $request)
+    {
+        try {
+            $books = Book::where('title', 'like', '%' . $request->title . '%')->paginate(10);
+
+            return response()->json([
+                "books" => $books
+            ], 200);
+        } catch (Throwable $e) {
+            return response()->json([
+                "error" => [
+                    "message" => "Ocorreu um erro ao carregar a lista de livros",
                     "details" => $e->getMessage()
                 ]
             ], 500);
