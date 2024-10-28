@@ -1,0 +1,82 @@
+version: '3.8'
+services:
+  app:
+    image: app
+    container_name: app
+    build:
+      context: .
+      target: dev
+      dockerfile: app/Dockerfile
+    volumes:
+      - ./app:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+      - db
+  api:
+    image: bookvault
+    container_name: api
+    build:
+      args:
+        user: user
+        uid: 1000
+      context: .
+      dockerfile: api/Dockerfile
+    working_dir: /var/www/
+    volumes:
+      - ./api:/var/www
+    restart: unless-stopped
+    environment:
+      - COMPOSER_MEMORY_LIMIT=-1
+    depends_on:
+      - db
+    networks:
+      - bookvault
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-api
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "8000:80"
+      - "443:443"
+    volumes:
+      - ./api:/var/www
+      - ./api/docker/nginx:/etc/nginx/conf.d/
+    networks:
+      - bookvault
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: bookvault
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+      MYSQL_USER: root
+    ports:
+      - '3306:3306'
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - bookvault
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_bookvault
+    ports:
+      - '8081:80'
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    depends_on:
+      - db
+    networks:
+      - bookvault
+volumes:
+  db_data:
+networks:
+  bookvault:
+    driver: bridge
