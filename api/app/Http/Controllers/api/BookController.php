@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Throwable;
 
@@ -70,7 +71,33 @@ class BookController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $book = Book::findOrFail($id);
+
+            return response()->json([
+                "message" => "Livro encontrado com sucesso",
+                "book" => [
+                    "title" => $book->title,
+                    "author" => $book->author,
+                    "description" => $book->description,
+                    "published_date" => $book->published_date,
+                    "isbn" => $book->isbn
+                ]
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                "error" => [
+                    "message" => "Livro não encontrado"
+                ]
+            ], 404);
+        } catch (Throwable $e) {
+            return response()->json([
+                "error" => [
+                    "message" => "Ocorreu um erro ao buscar o livro",
+                    "details" => $e->getMessage()
+                ]
+            ], 500);
+        }
     }
 
     /**
