@@ -17,10 +17,14 @@ class BookController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $books = Book::paginate(10);
+            $title = $request->input('title');
+
+            $books = Book::when($title, function ($query, $title) {
+                return $query->where('title', 'like', '%' . $title . '%');
+            })->paginate(10);
 
             return response()->json([
                 "books" => $books

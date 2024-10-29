@@ -1,95 +1,92 @@
-import Image from "next/image";
+'use client'
 import styles from "./page.module.css";
+import { useEffect, useState } from "react";
+import Card from "@/components/Card/Card";
+
+interface Book {
+  id: string
+  title: string;
+  author: string;
+}
+
+interface Form {
+  title: string;
+}
 
 export default function Home() {
+  const [books, setBooks] = useState<Book[]>([]);
+  const [form, setForm] = useState<Form>({
+    title: ""
+  });
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  const callAPI = async (title: string = "") => {
+    try {
+      const response = await fetch("/api/books", {
+        method: "POST",
+        body: JSON.stringify({ title: title })
+      });
+      if (response.ok) {
+        const res = await response.json();
+        console.log("Response from API:", res);
+
+        if (res.books.books && res.books.books.data) {
+          setBooks(res.books.books.data);
+        }
+      }
+    } catch (e) {
+      console.error("Erro de fetch:", e);
+    }
+  };
+
+  useEffect(() => {
+    callAPI();
+  }, [])
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = e.target;
+    setForm({
+      ...form,
+      [name]: value,
+    });
+
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+
+    const timeout = setTimeout(() => {
+      callAPI(value);
+    }, 500);
+
+    setTypingTimeout(timeout);
+  };
+
   return (
     <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+      <div className={styles.header}>
+        BookVault
+      </div>
+      <div className={styles.main}>
+        <div className={styles.search}>
+          <input
+            name="title"
+            value={form.title}
+            onChange={handleChange}
+            type="text"
+            placeholder="Busque" />
+          <a href="/new-book" className={styles.newBook}>Novo livro</a>
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <div className={styles.books}>
+          {books.map((item, index) => {
+            return (
+              <Card item={item} key={index}></Card>
+            )
+          })
+          }
+        </div>
+      </div>
     </div>
   );
 }

@@ -2,7 +2,6 @@ version: '3.8'
 services:
   app:
     image: app
-    container_name: app
     build:
       context: .
       target: dev
@@ -16,9 +15,10 @@ services:
     depends_on:
       - api
       - db
+    networks:
+      - bookvault
   api:
     image: bookvault
-    container_name: api
     build:
       args:
         user: user
@@ -37,7 +37,6 @@ services:
       - bookvault
   nginx:
     image: nginx:alpine
-    container_name: nginx-api
     restart: unless-stopped
     ports:
       - "80:80"
@@ -63,7 +62,6 @@ services:
       - bookvault
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin_bookvault
     ports:
       - '8081:80'
     environment:
@@ -75,8 +73,21 @@ services:
       - db
     networks:
       - bookvault
+  minio:
+    image: minio/minio
+    command: server /data
+    environment:
+      MINIO_ACCESS_KEY: "minioadmin"
+      MINIO_SECRET_KEY: "minioadmin"
+    ports:
+      - "9001:9000"
+    volumes:
+      - minio_data:/data
+    networks:
+      - bookvault
 volumes:
   db_data:
+  minio_data:
 networks:
   bookvault:
     driver: bridge
