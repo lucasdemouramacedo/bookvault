@@ -56,6 +56,7 @@ class BookController extends Controller
             return response([
                 "message" => "Livro cadastrado com sucesso",
                 "book" => [
+                    "id" => $book->id,
                     "title" => $book->title,
                     "author" => $book->author,
                     "description" => $book->description,
@@ -87,6 +88,7 @@ class BookController extends Controller
             return response()->json([
                 "message" => "Livro encontrado com sucesso",
                 "book" => [
+                    "id" => $book->id,
                     "title" => $book->title,
                     "author" => $book->author,
                     "description" => $book->description,
@@ -128,6 +130,7 @@ class BookController extends Controller
             return response()->json([
                 "message" => "Livro atualizado com sucesso",
                 "book" => [
+                    "id" => $book->id,
                     "title" => $book->title,
                     "author" => $book->author,
                     "description" => $book->description,

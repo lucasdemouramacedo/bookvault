@@ -3,6 +3,7 @@ import styles from "./style.module.css";
 import logo from "../../../public/image.png";
 
 type Item = {
+    id: string
     title: string,
     author: string
 }

@@ -47,36 +47,36 @@ export default function EditBook({ params }: Props) {
             [name]: value,
         });
     };
-    const getBook = async () => {
-        try {
-            const response = await fetch("/api/books/book", {
-                method: "POST",
-                body: JSON.stringify({ id: id })
-            });
-            if (response.ok) {
-                const res = await response.json();
-                console.log("Response from API:", res);
-
-                if (res.book.book) {
-                    setForm(res.book.book);
-                } else {
-                    setNotification(true);
-                    setNotificationInfo({
-                        type: 'warn',
-                        message: res.book.error.message
-                    })
-                    setTimeout(() => {
-                        setNotification(false);
-                        redirect("/")
-                    }, 3000);
-                }
-            }
-        } catch (e) {
-            console.error("Erro de fetch:", e);
-        }
-    };
 
     useEffect(() => {
+        const getBook = async () => {
+            try {
+                const response = await fetch("/api/books/book", {
+                    method: "POST",
+                    body: JSON.stringify({ id: id })
+                });
+                if (response.ok) {
+                    const res = await response.json();
+                    console.log("Response from API:", res);
+
+                    if (res.book.book) {
+                        setForm(res.book.book);
+                    } else {
+                        setNotification(true);
+                        setNotificationInfo({
+                            type: 'warn',
+                            message: res.book.error.message
+                        })
+                        setTimeout(() => {
+                            setNotification(false);
+                            redirect("/")
+                        }, 3000);
+                    }
+                }
+            } catch (e) {
+                console.error("Erro de fetch:", e);
+            }
+        };
         getBook();
     }, [])
 
@@ -116,6 +116,7 @@ export default function EditBook({ params }: Props) {
                     })
                     setTimeout(() => {
                         setNotification(false);
+                        redirect("/details-book/" + id)
                     }, 3000);
                 }
             }

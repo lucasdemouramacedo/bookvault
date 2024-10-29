@@ -24,36 +24,36 @@ export default function EditBook({ params }: Props) {
     const [notification, setNotification] = useState(false)
     const [notificationInfo, setNotificationInfo] = useState({ type: '', message: '' })
 
-    const getBook = async () => {
-        try {
-            const response = await fetch("/api/books/book", {
-                method: "POST",
-                body: JSON.stringify({ id: id })
-            });
-            if (response.ok) {
-                const res = await response.json();
-                console.log("Response from API:", res);
-
-                if (res.book.book) {
-                    setBook(res.book.book);
-                } else {
-                    setNotification(true);
-                    setNotificationInfo({
-                        type: 'warn',
-                        message: res.book.error.message
-                    })
-                    setTimeout(() => {
-                        setNotification(false);
-                        redirect("/")
-                    }, 3000);
-                }
-            }
-        } catch (e) {
-            console.error("Erro de fetch:", e);
-        }
-    };
-
     useEffect(() => {
+        const getBook = async () => {
+            try {
+                const response = await fetch("/api/books/book", {
+                    method: "POST",
+                    body: JSON.stringify({ id: id })
+                });
+                if (response.ok) {
+                    const res = await response.json();
+                    console.log("Response from API:", res);
+    
+                    if (res.book.book) {
+                        setBook(res.book.book);
+                    } else {
+                        setNotification(true);
+                        setNotificationInfo({
+                            type: 'warn',
+                            message: res.book.error.message
+                        })
+                        setTimeout(() => {
+                            setNotification(false);
+                            redirect("/")
+                        }, 3000);
+                    }
+                }
+            } catch (e) {
+                console.error("Erro de fetch:", e);
+            }
+        };
+        
         getBook();
     }, [])
 
@@ -67,10 +67,10 @@ export default function EditBook({ params }: Props) {
                 const res = await response.json();
                 console.log("Response from API:", res);
 
-                if (res.book.book) {
+                if (res.data) {
                     setNotification(true);
                     setNotificationInfo({
-                        type: 'indo',
+                        type: 'info',
                         message: res.data.message
                     })
                     setTimeout(() => {

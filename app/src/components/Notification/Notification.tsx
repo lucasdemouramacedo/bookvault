@@ -1,6 +1,4 @@
-import Image from "next/image";
 import styles from "./style.module.css";
-import logo from "../../../public/imagem.jpg";
 
 type Props = {
     visible: boolean

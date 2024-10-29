@@ -1,6 +1,6 @@
 'use client'
 import styles from "./page.module.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Notification from "@/components/Notification/Notification";
 import { redirect } from "next/navigation";
 
